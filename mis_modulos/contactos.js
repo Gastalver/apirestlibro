@@ -6,7 +6,7 @@ var fs = require("fs");
 
 var lee_archivo_json = function(){
     var archivo = "./contactos.json";
-    return fs.readfilesync(archivo);  // devuelve un BUFFER, o sea, una serie de bytes
+    return fs.readFileSync(archivo);  // devuelve un BUFFER, o sea, una serie de bytes
 }
 
 exports.listado = function(){
@@ -17,9 +17,9 @@ exports.buscaNum = function(numerotlf){
     var todos = JSON.parse(lee_archivo_json());
     var resultado = todos.result
     for (var i=0; i < resultado.length; i++){
-        var contact = resultado[i];
-        if (contact.numero == numerotlf){
-            return(contact);
+        var sujeto = resultado[i];
+        if (sujeto.telefono == numerotlf){
+            return(sujeto);
         }
     }
     return null;
@@ -29,7 +29,7 @@ exports.buscaCampo = function(campo,valor){
     var todos = JSON.parse(lee_archivo_json());
     var resultado = todos.result
     for (var i=0; i < resultado.length; i++){
-        var contact = resultado[i];
+        contact = resultado[i];
         if (contact[campo] == valor){
             return(contact);
         }
@@ -37,7 +37,7 @@ exports.buscaCampo = function(campo,valor){
     return null;
 }
 
-exports.listagrupos = function(){
+exports.listaGrupos = function(){
     var todos = JSON.parse(lee_archivo_json());
     var resultado = todos.result
     var lista = new Array();
@@ -53,7 +53,7 @@ exports.listagrupos = function(){
     return lista;
 }
 
-exports.miembrosgrupo = function (grupo) {
+exports.listaMiembrosGrupo = function (grupo) {
     var todos = JSON.parse(lee_archivo_json());
     var resultado = todos.result;
     var miembros = new Array();

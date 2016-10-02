@@ -3,31 +3,31 @@
 {
   "nombre": "Miguel",
   "apellidos": "Gastalver Trujillo",
-  "telefono": 609181541,
+  "telefono": "609181541",
   "grupo": ["Abogados","Familia"]
 },
 {
   "nombre": "José María",
   "apellidos": "Castro Gallardo",
-  "telefono": 647374755,
+  "telefono": "647374755",
   "grupo": ["Abogados"]
 },
 {
   "nombre": "Ignacio",
   "apellidos": "Espejo Ruiz",
-  "telefono": 670282334,
+  "telefono": "670282334",
   "grupo": ["Procuradores","Amigos"]
 },
 {
   "nombre": "Alejandro",
   "apellidos": "Martínez Ruiz",
-  "telefono": 123456789,
+  "telefono": "123456789",
   "grupo": ["Clientes"]
 },
 {
   "nombre": "Mercedes",
   "apellidos": "Alcon Camas",
-  "telefono": 987654321,
+  "telefono": "987654321",
   "grupo": ["Clientes"]
 }
 ]
