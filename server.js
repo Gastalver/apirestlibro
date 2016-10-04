@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 //Ejemplo de parametro en path de la URL
 app.get('/bienvenido/:nombre',function (request,response) {
-    response.send("<html><head></head><body>Bienvenido " + request.params.nombre + "</body></body></head></html>");
+    response.send("<html><head></head><body>Bienvenido " + request.params.nombre + "</body></html>");
     }
 );
 
@@ -48,12 +48,13 @@ app.get('/contactos', function(request, response){
         if (Object.keys(get_params).length === 0)
         {
             response.setHeader('content-type','application/json');
+            response.set('charset','utf-8');
             response.end(JSON.stringify(agenda.listado()));
         }
         else
         {
             response.setHeader('content-type','application/json');
-            response.end(JSON.stringify(agenda.buscaCampo(get_params.arg,get_params.value)));
+            response.end(JSON.stringify(agenda.buscaCampo(get_params.arg,get_params.value))); // Arreglar: Siempre devuelve el primer registro.
         }
     }
 );

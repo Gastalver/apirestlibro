@@ -24,8 +24,9 @@ var buscaNum = function(numerotlf){
 var buscaCampo = function(campo,valor){
     var todos = JSON.parse(lee_archivo_json());
     var resultado = todos.result
+    var contact = null;
     for (var i=0; i < resultado.length; i++){
-        var contact = resultado[i];
+        contact = resultado[i];
         if (contact[campo] == valor){
             return(contact);
         }
