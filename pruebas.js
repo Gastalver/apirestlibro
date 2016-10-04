@@ -7,11 +7,11 @@ var lee_archivo_json = function(){
 
  var listado = function(){
     return JSON.parse(lee_archivo_json());
-}
+};
 
 var buscaNum = function(numerotlf){
     var todos = JSON.parse(lee_archivo_json());
-    var resultado = todos.result
+    var resultado = todos.result;
     for (var i=0; i < resultado.length; i++){
         var contact = resultado[i];
         if (contact.telefono == numerotlf){
@@ -19,11 +19,11 @@ var buscaNum = function(numerotlf){
         }
     }
     return null;
-}
+};
 
 var buscaCampo = function(campo,valor){
     var todos = JSON.parse(lee_archivo_json());
-    var resultado = todos.result
+    var resultado = todos.result;
     var contact = null;
     for (var i=0; i < resultado.length; i++){
         contact = resultado[i];
@@ -32,12 +32,12 @@ var buscaCampo = function(campo,valor){
         }
     }
     return null;
-}
+};
 
 var listagrupos = function(){
     var todos = JSON.parse(lee_archivo_json());
-    var resultado = todos.result
-    var lista = new Array();
+    var resultado = todos.result;
+    var lista = [];
 
     for (var i=0; i < resultado.length; i++){
         var grupos = resultado[i].grupo;
@@ -48,12 +48,12 @@ var listagrupos = function(){
         }
     }
     return lista;
-}
+};
 
 var miembrosgrupo = function (grupo) {
     var todos = JSON.parse(lee_archivo_json());
     var resultado = todos.result;
-    var miembros = new Array();
+    var miembros = [];
     for (var i = 0; i < resultado.length; i++) {
         if (resultado[i].grupo.indexOf(grupo) > -1) {
             miembros.push(resultado[i]);

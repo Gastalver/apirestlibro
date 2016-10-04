@@ -6,6 +6,7 @@ var url= require("url");
 var http = require('http');
 var app = express();
 var agenda = require('./mis_modulos/contactos');
+var objeteador = require('./mis_modulos/propiedadesObjeto');
 
 
 // Middleware
@@ -45,6 +46,7 @@ app.get('/api/', function(request,response){
 
 app.get('/contactos', function(request, response){
         var get_params = url.parse(request.url,true).query;
+
         if (Object.keys(get_params).length === 0)
         {
             response.setHeader('content-type','application/json');
@@ -53,8 +55,10 @@ app.get('/contactos', function(request, response){
         }
         else
         {
+            console.log(objeteador.mostrarPropiedades(get_params,"get_params"));
             response.setHeader('content-type','application/json');
-            response.end(JSON.stringify(agenda.buscaCampo(get_params.arg,get_params.value))); // Arreglar: Siempre devuelve el primer registro.
+            response.end(JSON.stringify(agenda.buscaCampo(get_params.arg,get_params.value)));
+            // Arreglar: Siempre devuelve el primer registro. No captura las propiedades del objeto devuelto por QueryString
         }
     }
 );
