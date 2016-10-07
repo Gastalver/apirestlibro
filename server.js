@@ -7,6 +7,17 @@ var http = require('http');
 var app = express();
 var agenda = require('./mis_modulos/contactos');
 var objeteador = require('./mis_modulos/propiedadesObjeto');
+var mongoose = require('mongoose');
+
+// Schema para los contactos
+var contactoSchema = new mongoose.Schema({
+    nombre: string,
+    apellidos: string,
+    telefono: {type: string, index: {unique: true}},
+    grupo: [string]
+});
+
+
 
 
 // Middleware
@@ -15,6 +26,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 
+
+
+// Request Handlers
 
 //Ejemplo de parametro en path de la URL
 app.get('/bienvenido/:nombre',function (request,response) {
@@ -33,8 +47,6 @@ app.get('/hola',function (request,response) {
         response.send("<html><head></head><body>Hola " + get_params.nombre + "</body></body></head></html>");
     }
 });
-
-// Request Handlers
 
 app.get('/', function(request,response){
     response.send("<html><head></head><body>Front End</body></body></head></html>");
