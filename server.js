@@ -55,10 +55,15 @@ app.get('/contactos', function(request, response){
         }
         else
         {
-            console.log(objeteador.mostrarPropiedades(get_params,"get_params"));
+            var parametros = Object.getOwnPropertyNames(get_params);
+            console.log("Parametros: " + parametros);
+            var primerParametro = parametros[0];
+            console.log("Primer Parametro: " + primerParametro);
+            var valorPrimerParametro = get_params[primerParametro];
+            console.log("Valor primer parametro: " + valorPrimerParametro);
             response.setHeader('content-type','application/json');
-            response.end(JSON.stringify(agenda.buscaCampo(get_params.arg,get_params.value)));
-            // Arreglar: Siempre devuelve el primer registro. No captura las propiedades del objeto devuelto por QueryString
+            response.end(JSON.stringify(agenda.buscaCampo(primerParametro,valorPrimerParametro)));
+
         }
     }
 );
