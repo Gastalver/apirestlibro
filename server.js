@@ -10,14 +10,17 @@ var objeteador = require('./mis_modulos/propiedadesObjeto');
 var mongoose = require('mongoose');
 
 // Schema para los contactos
-var contactoSchema = new mongoose.Schema({
-    nombre: string,
-    apellidos: string,
-    telefono: {type: string, index: {unique: true}},
-    grupo: [string]
-});
+var contactoSchema = new mongoose.Schema(
+    {
+    nombre: String,
+    apellidos: String,
+    telefono: {type: String, index: {unique: true}},
+    grupo: [String]
+    }
+);
 
-
+// Modelo de Contactos para operar en la BD
+var contacto = mongoose.model('contacto',contactoSchema);
 
 
 // Middleware
@@ -25,7 +28,60 @@ app.use(logger('dev')); // Logs
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
+// Creación de una instancia de documento con el modelo contactoEjemplo
+var contactoEjemplo = new contacto(
+    {
+        nombre: 'Miguel',
+        apellidos: 'Cervantes Saavedra',
+        telefono: '666666666',
+        grupo: ["Escritores"]
+    }
+);
+// Conexión con la BD
+var db = mongoose.connection;
+mongoose.connect('mongodb://localhost/contactos');
 
+// Insertamos un documento en la BD
+ contactoEjemplo.save(function(error){
+   if (error) {
+       console.log("Error al intentar grabar contactoEjemplo");
+       console.log(error);
+   } else {
+       contactoEjemplo.save();
+       console.log("contactoEjemplo grabado correctamente");
+   }
+});
+
+// Ejemplo de búsqueda de datos con el modelo
+contacto.find({telefono: '666666666'}, function(error, resultado){
+    if (error){
+        console.log("Error al buscar contacto con el numero 666 66 66 66");
+        console.error(error);
+    } else {
+        console.dir(resultado);
+    }
+});
+
+// Y finalmente lo borramos
+contacto.findOne({telefono: '666666666'}, function(error,datos){
+    if(error){
+        console.log("Error al buscar el registro para borrarlo");
+        return;
+    } else if (!datos){
+        console.log("No se ha encontrado ningún registro con ese número")
+        return;
+    } else {
+        datos.remove(function(error){
+            if (!error){
+                datos.remove();
+                console.log("Registro borrado");
+            } else {
+                console.log("Error al intentar eliminar el registro");
+                console.log(error);
+            }
+        });
+    }
+});
 
 
 // Request Handlers
