@@ -66,10 +66,10 @@ contacto.find({telefono: '666666666'}, function(error, resultado){
 contacto.findOne({telefono: '666666666'}, function(error,datos){
     if(error){
         console.log("Error al buscar el registro para borrarlo");
-        return;
+
     } else if (!datos){
-        console.log("No se ha encontrado ningún registro con ese número")
-        return;
+        console.log("No se ha encontrado ningún registro con ese número");
+
     } else {
         datos.remove(function(error){
             if (!error){
