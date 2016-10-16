@@ -2,8 +2,7 @@
  * Creates, Removes, Updates or Deletes a Document based on Contacto Model.
  * */
 
-exports.remove(modelo, numTelefono, response);
-{
+exports.elimina = function (modelo, numTelefono, response) {
     console.log("Borrando el contacto con número de teléfono: " + numTelefono);
 
     model.findOne({telefono: numTelefono}, function (error, contactoEncontrado) {
@@ -36,10 +35,9 @@ exports.remove(modelo, numTelefono, response);
             }
         }
     });
-}
+};
 
-exports.update(modelo, requestBody, response);
-{
+exports.actualiza = function (modelo, requestBody, response) {
     var numTelefono = requestBody.telefono;
     modelo.findOne({numTelefono}, function (error, contactoEncontrado) {
         if (error) {
@@ -50,7 +48,7 @@ exports.update(modelo, requestBody, response);
             }
 
         } else {
-            var contacto = aContacto(requestBody, model);
+            var contacto = pasaRequestBodyaInstanciadeContacto(requestBody, modelo);
             if (!contactoEncontrado) {
                 console.log("No existe ningún contacto con el teléfono " + numTelefono + ". Se creará uno nuevo.");
                 contacto.save(function (error) {
@@ -83,19 +81,18 @@ exports.update(modelo, requestBody, response);
             }
         }
     });
-}
+};
 
-exports.create(modelo, requestBody, response);
-{
-    var contacto = aContacto(requestBody, model);
+exports.crea = function (modelo, requestBody, response) {
+    var nuevoContacto = pasaRequestBodyaInstanciadeContacto(requestBody, modelo);
     var numTelefono = requestBody.telefono;
-    contacto.save(function (error) {
+    nuevoContacto.save(function (error) {
         if (!error) {
-            contacto.save();
+            nuevoContacto.save();
         } else {
             // Vamos a comprobar si ya existe un contacto con ese número, que es índice único.
             console.log("Comprobando si existe ya un contacto con el teléfono " + numTelefono);
-            contacto.findOne({telefono: numTelefono}, function (error, contactoEncontrado) {
+            modelo.findOne({telefono: numTelefono}, function (error, contactoEncontrado) {
                 if (error) {
                     console.log(error);
                     if (response != null) {
@@ -104,7 +101,7 @@ exports.create(modelo, requestBody, response);
                     }
 
                 } else {
-                    var contacto = aContacto(requestBody, model);
+                    var contacto = pasaRequestBodyaInstanciadeContacto(requestBody, modelo);
                     if (!contactoEncontrado) {
                         console.log("No hay un contacto con ese número. Será creado.");
                         contacto.save(function (error) {
@@ -142,9 +139,9 @@ exports.create(modelo, requestBody, response);
             });
         }
     });
-}
+};
 
-function aContacto(body, Contacto) {
+function pasaRequestBodyaInstanciadeContacto(body, Contacto) {
     return new Contacto(
         {
             nombre: body.nombre,
@@ -183,16 +180,32 @@ exports.encuentraPorNumero = function (modelo, numTelefono, response) {
     });
 };
 
-exports.listado = function (model, response) {
-    model.find({}, function (error, contactos) {
+exports.listado = function (modelo, response) {
+    modelo.find({}, function (error, listadeContactos) {
         if (error) {
             console.error(error);
             return null;
         }
         if (response != null) {
             response.setHeader('content-type', 'application/json');
-            response.end(JSON.stringify(contactos));
+            response.end(JSON.stringify(listadeContactos));
         }
-        return JSON.stringify(contactos);
+        return JSON.stringify(listadeContactos);
     });
+};
+
+exports.buscaCampo = function (modelo, campo, valor, response) { // TODO Corregir buscaCampo
+
+    modelo.find({campo: valor}, function (error, listadeContactos) {
+        if (error) {
+            console.error(error);
+            return null;
+        }
+        if (response != null) {
+            response.setHeader('content-type', 'application/json');
+            response.end(JSON.stringify(listadeContactos));
+        }
+        return JSON.stringify(listadeContactos);
+    });
+
 };
