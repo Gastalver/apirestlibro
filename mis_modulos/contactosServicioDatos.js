@@ -86,6 +86,7 @@ exports.actualiza = function (modelo, requestBody, response) {
 exports.crea = function (modelo, requestBody, response) {
     var nuevoContacto = pasaRequestBodyaInstanciadeContacto(requestBody, modelo);
     var numTelefono = requestBody.telefono;
+    console.log("numTelefono: " + numTelefono);
     nuevoContacto.save(function (error) {
         if (!error) {
             nuevoContacto.save();
@@ -101,12 +102,12 @@ exports.crea = function (modelo, requestBody, response) {
                     }
 
                 } else {
-                    var contacto = pasaRequestBodyaInstanciadeContacto(requestBody, modelo);
+                    var nuevoContacto = pasaRequestBodyaInstanciadeContacto(requestBody, modelo);
                     if (!contactoEncontrado) {
                         console.log("No hay un contacto con ese número. Será creado.");
-                        contacto.save(function (error) {
+                        nuevoContacto.save(function (error) {
                                 if (!error) {
-                                    contacto.save();
+                                    nuevoContacto.save();
                                 } else {
                                     console.log(error);
                                 }
@@ -120,10 +121,10 @@ exports.crea = function (modelo, requestBody, response) {
                     } else {
                         // Si ya existía el contacto lo actualizamos.
                         console.log("Existía un contacto con ese número. Actualizando datos");
-                        contactoEncontrado.nombre = contacto.nombre;
-                        contactoEncontrado.apellidos = contacto.apellidos;
-                        contactoEncontrado.telefono = contacto.telefono;
-                        contactoEncontrado.grupo = contacto.grupo;
+                        contactoEncontrado.nombre = nuevoContacto.nombre;
+                        contactoEncontrado.apellidos = nuevoContacto.apellidos;
+                        contactoEncontrado.telefono = nuevoContacto.telefono;
+                        contactoEncontrado.grupo = nuevoContacto.grupo;
                         contactoEncontrado.save(function (error) {
                             if (!error) {
                                 contactoEncontrado.save();
@@ -148,7 +149,8 @@ function pasaRequestBodyaInstanciadeContacto(body, Contacto) {
             apellidos: body.apellidos,
             telefono: body.telefono,
             grupo: body.grupo,
-        });
+        }
+    );
 }
 
 exports.encuentraPorNumero = function (modelo, numTelefono, response) {
