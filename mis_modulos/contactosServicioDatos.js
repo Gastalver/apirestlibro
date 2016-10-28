@@ -5,7 +5,7 @@
 exports.elimina = function (modelo, numTelefono, response) {
     console.log("Borrando el contacto con número de teléfono: " + numTelefono);
 
-    model.findOne({telefono: numTelefono}, function (error, contactoEncontrado) {
+    modelo.findOne({telefono: numTelefono}, function (error, contactoEncontrado) {
         if (error) {
             console.log("Error borrando el contacto: " + error);
             if (response != null) {

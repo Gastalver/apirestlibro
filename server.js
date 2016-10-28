@@ -54,7 +54,7 @@ app.post('/contactos', function (request, response) {  // TOdo Actualizar no fun
 app.put('/contactos', function (request, response) {  // TODO Crear no funciona. No graba.
     servicioDatos.crea(Contacto, request.body, response)
 });
-app.delete('/contacts/:numTlf', function (request, response) { // TODO Comprobar delete
+app.delete('/contactos/:numTlf', function (request, response) {
     servicioDatos.elimina(Contacto, request.params.numTlf, response);
 });
 app.get('/contactos', function (request, response) {
