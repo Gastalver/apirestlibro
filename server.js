@@ -7,7 +7,8 @@ var http = require('http');
 var app = express();
 // var objeteador = require('./mis_modulos/propiedadesObjeto');
 var mongoose = require('mongoose');
-var servicioDatos = require("./mis_modulos/contactosServicioDatos_v1");
+var servicioDatos_v1 = require("./mis_modulos/contactosServicioDatos_v1");
+var servicioDatos_v2 = require("./mis_modulos/contactosServicioDatos_v2");
 
 // Middleware
 app.use(logger('dev')); // Logs
@@ -31,27 +32,18 @@ var contactoSchema = new mongoose.Schema(
 // Modelo de Contactos para operar en la BD
 var Contacto = mongoose.model('Contacto', contactoSchema);
 
-// Inserción de prueba - OK
-// var Nena = new Contacto;
-// Nena.nombre = "Miguel";
-// Nena.apellidos = "Gastalver Trujillo";
-// Nena.telefono = "609181541";
-// Nena.grupo = ["Abogados"];
-// Nena.save();
-
-
-// Request Handler
+// Request Handler V1
 
 app.get('/v1/contactos/:numTlf', function (request, response) {
     console.log(request.url + " pregunta por: " + request.params.numTlf);
-    servicioDatos.encuentraPorNumero(Contacto, request.params.numTlf, response);
+    servicioDatos_v1.encuentraPorNumero(Contacto, request.params.numTlf, response);
 });
 
 app.get('/v1/contactos', function (request, response) {
     var get_params = url.parse(request.url, true).query;
     if (Object.keys(get_params).length === 0) {
         console.log("Listado completo, ya que no se envían parámetros");
-        servicioDatos.listado(Contacto, response);
+        servicioDatos_v1.listado(Contacto, response);
     }
     else {
         var parametros = Object.getOwnPropertyNames(get_params);
@@ -61,23 +53,49 @@ app.get('/v1/contactos', function (request, response) {
         var valorPrimerParametro = get_params[primerParametro];
         console.log("Valor primer parametro: " + valorPrimerParametro);
         console.log("El parametro es del tipo " + typeof(valorPrimerParametro));
-        servicioDatos.buscaCampo(Contacto, primerParametro, valorPrimerParametro, response);
+        servicioDatos_v1.buscaCampo(Contacto, primerParametro, valorPrimerParametro, response);
     }
 
 });
 
 
 app.post('/v1/contactos', function (request, response) {
-    servicioDatos.crea(Contacto, request.body, response)
+    servicioDatos_v1.crea(Contacto, request.body, response)
 });
 
 app.put('/v1/contactos', function (request, response) {
-    servicioDatos.actualiza(Contacto, request.body, response)
+    servicioDatos_v1.actualiza(Contacto, request.body, response)
 });
 
 app.delete('/v1/contactos/:numTlf', function (request, response) {
-    servicioDatos.elimina(Contacto, request.params.numTlf, response);
+    servicioDatos_v1.elimina(Contacto, request.params.numTlf, response);
 });
+
+// Redirección mientras desarrollamos nueva versión
+// app.get('/contactos', function(request, response) {
+// response.writeHead(301, {'Location' : '/vX/contactos/'});
+// response.end('API Version X-1 movida a /vX/contactos/: ');
+// });
+
+// Request Handler V2
+
+app.get('/contactos', function (request, response) {
+    var get_params = url.parse(request.url, true).query;
+    if (Object.keys(get_params).length === 0) {
+        console.log("Listado completo, ya que no se envían parámetros");
+        servicioDatos_v2.listado(Contacto, response);
+    }
+    else {
+        var primerParametro = Object.keys(get_params)[0];
+        console.log("Primer Parametro: " + primerParametro);
+        var valorPrimerParametro = get_params[primerParametro];
+        console.log("Valor primer parametro: " + valorPrimerParametro);
+        console.log("El parametro es del tipo " + typeof(valorPrimerParametro));
+        servicioDatos_v2.buscaCampo(Contacto, primerParametro, valorPrimerParametro, response);
+    }
+
+});
+
 
 http.createServer(app).listen(3000, function(){
     console.log('Servidor Express operativo en puerto 3000');
