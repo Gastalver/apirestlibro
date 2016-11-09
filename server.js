@@ -5,7 +5,6 @@ var logger = require("morgan");
 var url= require("url");
 var http = require('http');
 var app = express();
-var agenda = require('./mis_modulos/contactos');
 // var objeteador = require('./mis_modulos/propiedadesObjeto');
 var mongoose = require('mongoose');
 var servicioDatos = require("./mis_modulos/contactosServicioDatos");
@@ -41,23 +40,13 @@ var Contacto = mongoose.model('Contacto', contactoSchema);
 // Nena.save();
 
 
-// Request Handlers
+// Request Handler
 
 app.get('/contactos/:numTlf', function (request, response) {
     console.log(request.url + " pregunta por: " + request.params.numTlf);
     servicioDatos.encuentraPorNumero(Contacto, request.params.numTlf, response);
 });
 
-app.post('/contactos', function (request, response) {  // TOdo Actualizar no funciona.
-    servicioDatos.actualiza(Contacto, request.body, response)
-});
-app.put('/contactos', function (request, response) {  // TODO Revisar. Graba pero algo falla.
-    servicioDatos.crea(Contacto, request.body, response)
-});
-
-app.delete('/contactos/:numTlf', function (request, response) {
-    servicioDatos.elimina(Contacto, request.params.numTlf, response);
-});
 app.get('/contactos', function (request, response) {
     var get_params = url.parse(request.url, true).query;
     if (Object.keys(get_params).length === 0) {
@@ -75,7 +64,20 @@ app.get('/contactos', function (request, response) {
         servicioDatos.buscaCampo(Contacto, primerParametro, valorPrimerParametro, response);
     }
 
-}); // TODO Corregir busqueda por parametros
+});
+
+
+app.post('/contactos', function (request, response) {
+    servicioDatos.crea(Contacto, request.body, response)
+});
+
+app.put('/contactos', function (request, response) {
+    servicioDatos.actualiza(Contacto, request.body, response)
+});
+
+app.delete('/contactos/:numTlf', function (request, response) {
+    servicioDatos.elimina(Contacto, request.params.numTlf, response);
+});
 
 http.createServer(app).listen(3000, function(){
     console.log('Servidor Express operativo en puerto 3000');
