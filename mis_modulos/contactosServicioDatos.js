@@ -251,7 +251,7 @@ exports.listado = function (modelo, response) {
     });
 };
 
-exports.buscaCampo = function (Contacto, primerParametro, valorPrimerParametro, response) { // TODO Corregir buscaCampo
+exports.buscaCampo = function (Contacto, primerParametro, valorPrimerParametro, response) {
 
     Contacto.find().where(primerParametro, valorPrimerParametro).exec(function (error, listadeContactos) {
         if (error) {
