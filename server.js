@@ -7,7 +7,7 @@ var http = require('http');
 var app = express();
 // var objeteador = require('./mis_modulos/propiedadesObjeto');
 var mongoose = require('mongoose');
-var servicioDatos = require("./mis_modulos/contactosServicioDatos");
+var servicioDatos = require("./mis_modulos/contactosServicioDatos_v1");
 
 // Middleware
 app.use(logger('dev')); // Logs
@@ -42,12 +42,12 @@ var Contacto = mongoose.model('Contacto', contactoSchema);
 
 // Request Handler
 
-app.get('/contactos/:numTlf', function (request, response) {
+app.get('/v1/contactos/:numTlf', function (request, response) {
     console.log(request.url + " pregunta por: " + request.params.numTlf);
     servicioDatos.encuentraPorNumero(Contacto, request.params.numTlf, response);
 });
 
-app.get('/contactos', function (request, response) {
+app.get('/v1/contactos', function (request, response) {
     var get_params = url.parse(request.url, true).query;
     if (Object.keys(get_params).length === 0) {
         console.log("Listado completo, ya que no se envían parámetros");
@@ -67,15 +67,15 @@ app.get('/contactos', function (request, response) {
 });
 
 
-app.post('/contactos', function (request, response) {
+app.post('/v1/contactos', function (request, response) {
     servicioDatos.crea(Contacto, request.body, response)
 });
 
-app.put('/contactos', function (request, response) {
+app.put('/v1/contactos', function (request, response) {
     servicioDatos.actualiza(Contacto, request.body, response)
 });
 
-app.delete('/contactos/:numTlf', function (request, response) {
+app.delete('/v1/contactos/:numTlf', function (request, response) {
     servicioDatos.elimina(Contacto, request.params.numTlf, response);
 });
 
