@@ -207,7 +207,6 @@ function pasaRequestBodyaInstanciadeContacto(body, Contacto) {
         }
     );
 }
-
 exports.encuentraPorNumero = function (modelo, numTelefono, response) {
     modelo.findOne({telefono: numTelefono}, function (error, contactoEncontrado) {
 
@@ -274,4 +273,56 @@ exports.buscaCampo = function (Contacto, primerParametro, valorPrimerParametro, 
         }
     });
 
+};
+
+// TODO: Graba, y recupera, pero falla el tipo mime. Se muestra octect/binario no imagen/jpg y no se visualiza.
+// TODO: Cambiar nombre archivo de imagen.jpg a imagen, como en ejemplo.
+exports.actualizaImagen = function (gfs, request, response) { // TODO: Corregir reference error
+    var numTelefono = request.params.numTlf;
+    console.log('Actualizando imagen de contacto con número de teléfono: ' + numTelefono);
+    request.pipe(gfs.createWriteStream({_id: numTelefono, filename: 'image.jpg', mode: 'w'}));
+    response.send("Imagen correctamente actualizada del contacto con número de teléfono: " + numTelefono);
+};
+
+exports.traeImagen = function (gfs, numTelefono, response) {
+
+    console.log('Pidiendo imagen del contacto con número de teléfono: ' + numTelefono);
+
+    var streamImagen = gfs.createReadStream({
+        _id: numTelefono,
+        filename: 'image.jpg',
+        mode: 'r'
+    });
+
+    streamImagen.on('error', function (error) {
+        response.status('404').send('Not found');
+
+    });
+
+    response.setHeader('Content-Type', 'image/jpeg');
+
+    streamImagen.pipe(response);
+};
+
+exports.borraImagen = function (gfs, mongodb, numTelefono, response) {
+    console.log('Borrando la imagen del contacto con número de teléfono:' + numTelefono);
+    // gridfs-stream todavía no incluye un método para eliminar binarios, la única manera es
+    // eliminar a mano el binario, que mongo guarda en la colección fs.files
+
+    var collection = mongodb.collection('fs.files');
+    collection.remove({_id: numTelefono, filename: 'image.jpg'},
+        function (error, contact) {
+            if (error) {
+                console.log(error);
+                return;
+            }
+            if (contact === null) {
+                response.send('404', 'Not found');
+
+            }
+            else {
+                console.log('Borrada correctamente la imagen del contacto con número de teléfono: ' + numTelefono);
+            }
+        });
+    response.send('Borrada correctamente la imagen del contacto con número de teléfono: ' + numTelefono);
 };
