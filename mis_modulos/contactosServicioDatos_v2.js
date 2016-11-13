@@ -275,8 +275,8 @@ exports.buscaCampo = function (Contacto, primerParametro, valorPrimerParametro, 
 
 };
 
-// TODO: Graba, y recupera, pero falla el tipo mime. Se muestra octect/binario no imagen/jpg y no se visualiza.
-// TODO: Cambiar nombre archivo de imagen.jpg a imagen, como en ejemplo.
+// Para subir archivos, hay que indicar en la cabecera del request Content-type image/jpg
+
 exports.actualizaImagen = function (gfs, request, response) { // TODO: Corregir reference error
     var numTelefono = request.params.numTlf;
     console.log('Actualizando imagen de contacto con número de teléfono: ' + numTelefono);
