@@ -326,3 +326,20 @@ exports.borraImagen = function (gfs, mongodb, numTelefono, response) {
         });
     response.send('Borrada correctamente la imagen del contacto con número de teléfono: ' + numTelefono);
 };
+
+exports.pagina = function (modelo, request, response) { // TODO: Corregir: El objeto devuelto no muestra pageCount ni result.
+    modelo.paginate({}, {page: request.query.page, limit: request.query.limit},
+        function (error, pageCount, result, itemCount) {
+            if (error) {
+                console.error(error);
+                response.writeHead(500, {'Content-Type': 'text/plain'});
+                response.end('Internal server error');
+                return;
+            }
+            response.json({
+                object: 'Contactos',
+                page_count: pageCount,
+                result: result
+            });
+        });
+};
