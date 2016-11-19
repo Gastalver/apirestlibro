@@ -13,8 +13,15 @@ var servicioDatos_v1 = require("./mis_modulos/contactosServicioDatos_v1");
 var servicioDatos_v2 = require("./mis_modulos/contactosServicioDatos_v2");
 var mongoosePaginate = require('mongoose-paginate');
 var expressPaginate = require('express-paginate');
+
+// Configuración de logs
+var logDirectorio = __dirname + "/logs";
+fs.statSync(logDirectorio).isDirectory() || fs.mkdir(logDirectorio);
+var logStream = fs.createWriteStream(__dirname + "/logs/access.log", {'flags': 'a'});
+
+
 // Middleware
-app.use(logger('dev')); // Logs
+app.use(logger('dev', {stream: logStream}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(expressPaginate.middleware(3, 10));
