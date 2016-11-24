@@ -11,9 +11,8 @@ var mongoose = require('mongoose');
 var Grid = require('gridfs-stream');
 var servicioDatos_v1 = require("./mis_modulos/contactosServicioDatos_v1");
 var servicioDatos_v2 = require("./mis_modulos/contactosServicioDatos_v2");
-var mongoosePaginate = require('mongoose-paginate');
 var expressPaginate = require('express-paginate');
-
+var mongoosePaginate = require('mongoose-paginate');
 // Configuración de logs
 var logDirectorio = __dirname + "/logs";
 fs.statSync(logDirectorio).isDirectory() || fs.mkdir(logDirectorio);
@@ -24,7 +23,7 @@ var logStream = fs.createWriteStream(__dirname + "/logs/access.log", {'flags': '
 app.use(logger('dev', {stream: logStream}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(expressPaginate.middleware(3, 10));
+app.use(expressPaginate.middleware(5, 10));
 
 // Conexión con la BD
 mongoose.connect('mongodb://localhost/contactos');
@@ -105,7 +104,8 @@ app.get('/v2/contactos', function (request, response) {
         console.log("Listado completo, paginado, ya que no se envían parámetros");
         servicioDatos_v2.pagina(Contacto, request, response);
     }
-    else if (get_params['limit'] != null || get_params['page' != null]) {
+    else if (get_params['limit'] != null || get_params['page' != null]) { //TODO: Incompatibilidad parametros paginacion y busqueda por parámetros
+        console.log("Voy a paginar porque he detectado parametro limit o page");
         servicioDatos_v2.pagina(Contacto, request, response)
     }
     else {
