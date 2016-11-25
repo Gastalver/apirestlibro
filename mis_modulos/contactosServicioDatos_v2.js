@@ -108,6 +108,7 @@ exports.actualiza = function (modelo, requestBody, response) {
     });
 };
 
+// Para crear registros via HTTP indicar el Content-Type: application/json en la cabecera, y mandar un objeto JSON en el cuerpo.
 exports.crea = function (modelo, requestBody, response) {
     var nuevoContacto = pasaRequestBodyaInstanciadeContacto(requestBody, modelo);
     var numTelefono = requestBody.telefono;
