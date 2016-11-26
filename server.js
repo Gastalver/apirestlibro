@@ -17,13 +17,13 @@ var mongoosePaginate = require('mongoose-paginate');
 var logDirectorio = __dirname + "/logs";
 fs.statSync(logDirectorio).isDirectory() || fs.mkdir(logDirectorio);
 var logStream = fs.createWriteStream(__dirname + "/logs/access.log", {'flags': 'a'});
-
+var purgador = require("./mis_modulos/purgaQuery");
 
 // Middleware
 app.use(logger('dev', {stream: logStream}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(expressPaginate.middleware(5, 10));
+app.use(expressPaginate.middleware(5, 10)); // Default req.query.limit.
 
 // Conexión con la BD
 mongoose.connect('mongodb://localhost/contactos');
@@ -104,18 +104,20 @@ app.get('/v2/contactos', function (request, response) {
         console.log("Listado completo, paginado, ya que no se envían parámetros");
         servicioDatos_v2.pagina(Contacto, request, response);
     }
-    else if (get_params['limit'] != null || get_params['page' != null]) { //TODO: Incompatibilidad parametros paginacion y busqueda por parámetros
-        console.log("Voy a paginar porque he detectado parametro limit o page");
-        servicioDatos_v2.pagina(Contacto, request, response)
-    }
     else {
 
-        var primerParametro = Object.keys(get_params)[0];
-        console.log("Primer Parametro: " + primerParametro);
-        var valorPrimerParametro = get_params[primerParametro];
-        console.log("Valor primer parametro: " + valorPrimerParametro);
-        console.log("El parametro es del tipo " + typeof(valorPrimerParametro));
-        servicioDatos_v2.buscaCampo(Contacto, primerParametro, valorPrimerParametro, response);
+        console.log("En bruto: " + Object.keys(get_params));
+        var queryPurgado= purgador.purga(get_params);
+        console.log("Purgado:"+ Object.keys(queryPurgado));
+        return;
+
+
+        //var primerParametro = Object.keys(get_params)[0];
+        //console.log("Primer Parametro: " + primerParametro);
+        //var valorPrimerParametro = get_params[primerParametro];
+        //console.log("Valor primer parametro: " + valorPrimerParametro);
+        //console.log("El parametro es del tipo " + typeof(valorPrimerParametro));
+        //servicioDatos_v2.buscaCampo(Contacto, primerParametro, valorPrimerParametro, response);
     }
 
 });
