@@ -5,9 +5,9 @@
  */
 
 exports.purga = function (q){
-    var qP = {};
+    var qP = new Object();
     for (var p in q){
-        if (Object.prototype.hasOwnProperty.call(q,p) && q.p!=='page'){
+        if (Object.prototype.hasOwnProperty.call(q,p) && q.p!=='page'){ // TODO: Comprobar condicional. No filtra.
             qP[p]=q.p;
         }
     }
