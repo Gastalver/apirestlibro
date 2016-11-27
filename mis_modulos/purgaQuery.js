@@ -6,10 +6,10 @@
 
 exports.purga = function (q){
     var qP = new Object();
-    for (var p in q){
-        if (Object.prototype.hasOwnProperty.call(q,p) && q.p!=='page'){ // TODO: Comprobar condicional. No filtra.
-            qP[p]=q.p;
-        }
-    }
+    qP = q;
+    if ((Object.keys(qP).indexOf('page')) !== -1)
+        delete qP.page;
+    if ((Object.keys(qP).indexOf('limit')) !== -1)
+        delete qP.limit;
     return qP;
 }

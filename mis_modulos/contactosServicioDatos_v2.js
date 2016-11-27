@@ -276,6 +276,31 @@ exports.buscaCampo = function (Contacto, primerParametro, valorPrimerParametro, 
 
 };
 
+exports.filtraYpagina = function (Contacto, queryPurgado, request, response) {
+
+    Contacto.paginate(queryPurgado, {page: request.query.page, limit: request.query.limit}, function (error, listadeContactos) {
+        if (error) {
+            console.log("Se ha producido un error al buscar.");
+            console.error(error);
+            if (response != null) {
+                response.writeHead("500", {'Content-Type': 'text/plain'});
+                response.end("Internal Server Error");
+            }
+            return null;
+        }
+        else {
+            //console.log("No se ha producido ningún error al buscar documentos con el valor "+ valorPrimerParametro + " en el campo "+ primerParametro + ".");
+
+            if (response != null) {
+                response.setHeader('content-type', 'application/json');
+                response.end(JSON.stringify(listadeContactos));
+            }
+            return JSON.stringify(listadeContactos);
+        }
+    });
+
+};
+
 // Para subir archivos, hay que indicar en la cabecera del request Content-type image/jpg
 
 exports.actualizaImagen = function (gfs, request, response) { // TODO: Corregir reference error
