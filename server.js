@@ -107,19 +107,10 @@ app.get('/v2/contactos', function (request, response) {
     else {
 
         console.log("En bruto: " + Object.keys(get_params));
-        var queryPurgado= purgador.purga(get_params);
-        console.log("Purgado:"+ Object.keys(queryPurgado));
-        return;
-
-
-        //var primerParametro = Object.keys(get_params)[0];
-        //console.log("Primer Parametro: " + primerParametro);
-        //var valorPrimerParametro = get_params[primerParametro];
-        //console.log("Valor primer parametro: " + valorPrimerParametro);
-        //console.log("El parametro es del tipo " + typeof(valorPrimerParametro));
-        //servicioDatos_v2.buscaCampo(Contacto, primerParametro, valorPrimerParametro, response);
+        var queryPurgado = purgador.purga(get_params);
+        console.log("Purgado:" + Object.keys(queryPurgado));
+        servicioDatos_v2.filtraYpagina(Contacto, queryPurgado, request, response);
     }
-
 });
 
 app.get('/v2/contactos/:numTlf', function (request, response) {
