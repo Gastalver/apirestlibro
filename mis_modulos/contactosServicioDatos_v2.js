@@ -303,7 +303,7 @@ exports.filtraYpagina = function (Contacto, queryPurgado, request, response) {
 
 // Para subir archivos, hay que indicar en la cabecera del request Content-type image/jpg
 
-exports.actualizaImagen = function (gfs, request, response) { // TODO: Corregir reference error
+exports.actualizaImagen = function (gfs, request, response) {
     var numTelefono = request.params.numTlf;
     console.log('Actualizando imagen de contacto con número de teléfono: ' + numTelefono);
     request.pipe(gfs.createWriteStream({_id: numTelefono, filename: 'image.jpg', mode: 'w'}));
