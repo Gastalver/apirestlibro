@@ -18,8 +18,10 @@ var logDirectorio = __dirname + "/logs";
 fs.statSync(logDirectorio).isDirectory() || fs.mkdir(logDirectorio);
 var logStream = fs.createWriteStream(__dirname + "/logs/access.log", {'flags': 'a'});
 var purgador = require("./mis_modulos/purgaQuery");
+var CacheControl = require("express-cache-control");
 
 // Middleware
+var cache = new CacheControl().middleware;
 app.use(logger('dev', {stream: logStream}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -98,7 +100,7 @@ app.delete('/v1/contactos/:numTlf', function (request, response) {
 
 // Handlers de los Request con número de version en la URL
 
-app.get('/v2/contactos', function (request, response) {
+app.get('/v2/contactos', cache("minutes",5),function (request, response) {
     var get_params = url.parse(request.url, true).query;
     if (Object.keys(get_params).length === 0) {
         console.log("Listado completo, paginado, ya que no se envían parámetros");
