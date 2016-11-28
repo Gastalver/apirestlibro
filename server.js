@@ -45,8 +45,39 @@ var contactoSchema = new mongoose.Schema(
 // Plugin del schema para paginar resultados.
 contactoSchema.plugin(mongoosePaginate);
 
+// Schema para los usuarios de la API
+var usuarioSchema = new mongoose.Schema(
+    {
+        usuario: {type: String, index: {unique:true}},
+        clave: String,
+        rol: String
+    }
+);
+
+
 // Modelo de Contactos para operar en la BD
 var Contacto = mongoose.model('Contacto', contactoSchema);
+
+// Modelo de usuarioAutorizado para operar en la BD
+var usuarioAutorizado = mongoose.model('Usuario',usuarioSchema);
+
+// Creamos el usuario autorizado admin
+var administrador = new usuarioAutorizado(
+    {
+        usuario: 'admin',
+        clave: 'admin',
+        rol: 'administrador'
+    }
+);
+
+administrador.save(function(error){
+    if(!error){
+        administrador.save();
+        console.log("Usuario admin creado");
+    } else {
+        console.log("Error al crear usuario admin:" + error);
+    }
+})
 
 // Request Handler de las direcciones publicadas. Reenvía a la version ACTUAL
 
