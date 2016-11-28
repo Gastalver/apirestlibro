@@ -2,7 +2,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path");
 var logger = require("morgan");
-var url= require("url");
+var url = require("url");
 var http = require('http');
 var app = express();
 // var objeteador = require('./mis_modulos/propiedadesObjeto');
@@ -19,6 +19,7 @@ fs.statSync(logDirectorio).isDirectory() || fs.mkdir(logDirectorio);
 var logStream = fs.createWriteStream(__dirname + "/logs/access.log", {'flags': 'a'});
 var purgador = require("./mis_modulos/purgaQuery");
 var CacheControl = require("express-cache-control");
+var autorizacionBasica = require("basic-auth");
 
 // Middleware
 var cache = new CacheControl().middleware;
@@ -48,7 +49,7 @@ contactoSchema.plugin(mongoosePaginate);
 // Schema para los usuarios de la API
 var usuarioSchema = new mongoose.Schema(
     {
-        usuario: {type: String, index: {unique:true}},
+        usuario: {type: String, index: {unique: true}},
         clave: String,
         rol: String
     }
@@ -59,7 +60,7 @@ var usuarioSchema = new mongoose.Schema(
 var Contacto = mongoose.model('Contacto', contactoSchema);
 
 // Modelo de usuarioAutorizado para operar en la BD
-var usuarioAutorizado = mongoose.model('Usuario',usuarioSchema);
+var usuarioAutorizado = mongoose.model('Usuario', usuarioSchema);
 
 // Creamos el usuario autorizado admin
 var administrador = new usuarioAutorizado(
@@ -70,14 +71,46 @@ var administrador = new usuarioAutorizado(
     }
 );
 
-administrador.save(function(error){
-    if(!error){
+administrador.save(function (error) {
+    if (!error) {
         administrador.save();
         console.log("Usuario admin creado");
     } else {
         console.log("Error al crear usuario admin:" + error);
     }
-})
+});
+// Middleware de autenticacion básica
+app.use(function (request, response, next) {
+    var credenciales = autorizacionBasica(request);
+    if (credenciales === undefined) {
+        console.log("No se ha proporcionado información de usuario");
+        response.statusCode = 401;
+        response.setHeader('WWW-Authenticate', 'Basic');
+        response.end('No autorizado')
+    } else {
+        console.log("Credenciales proporcionadas. Usuario: " + credenciales.name +  ". Clave: " + credenciales.pass);
+        autentifica(credenciales.name, credenciales.pass, response, next);
+    }
+});
+
+function autentifica(name, pass, response, callback) {
+    usuarioAutorizado.findOne({nombre: name, clave: pass}, function (error, usuario) {
+        if (error) {
+            console.log("Error al buscar usuario");
+            response.statusCode = 500;
+            response.end('Error 500')
+        } else if (!usuario) {
+            console.log("Usuario no encontrado"); // TODO: IDentificar por que no encuentra admin:admin. Revisar HTTP request.
+            response.statusCode = 401;
+            response.setHeader('WWW-Authenticate', 'Basic');
+            response.end('No autorizado')
+        } else {
+            console.log("Usuario " + usuario.nombre + " identificado correctamente");
+            return callback(null, usuario.nombre);
+        }
+    });
+}
+
 
 // Request Handler de las direcciones publicadas. Reenvía a la version ACTUAL
 
@@ -131,7 +164,7 @@ app.delete('/v1/contactos/:numTlf', function (request, response) {
 
 // Handlers de los Request con número de version en la URL
 
-app.get('/v2/contactos', cache("minutes",5),function (request, response) {
+app.get('/v2/contactos', cache("minutes", 5), function (request, response) {
     var get_params = url.parse(request.url, true).query;
     if (Object.keys(get_params).length === 0) {
         console.log("Listado completo, paginado, ya que no se envían parámetros");
@@ -183,6 +216,6 @@ app.delete('/v2/contactos/:numTlf/imagen', function (request, response) {
     servicioDatos_v2.borraImagen(gfs, mongodb.db, request.params.numTlf, response);
 });
 
-http.createServer(app).listen(3000, function(){
+http.createServer(app).listen(3000, function () {
     console.log('Servidor Express operativo en puerto 3000');
 });
