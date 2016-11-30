@@ -105,7 +105,7 @@ function autentifica(name, pass, response, callback) {
             response.setHeader('WWW-Authenticate', 'Basic');
             response.end('No autorizado')
         } else {
-            console.log("Usuario " + usuario.nombre + " identificado correctamente");
+            console.log("Usuario " + usuario.usuario + " identificado correctamente.");
             return callback(null, usuario.nombre);
         }
     });
