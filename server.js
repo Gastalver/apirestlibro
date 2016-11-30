@@ -94,13 +94,13 @@ app.use(function (request, response, next) {
 });
 
 function autentifica(name, pass, response, callback) {
-    usuarioAutorizado.findOne({nombre: name, clave: pass}, function (error, usuario) {
+    usuarioAutorizado.findOne({usuario: name, clave: pass}, function (error, usuario) {
         if (error) {
             console.log("Error al buscar usuario");
             response.statusCode = 500;
             response.end('Error 500')
         } else if (!usuario) {
-            console.log("Usuario no encontrado"); // TODO: IDentificar por que no encuentra admin:admin. Revisar HTTP request.
+            console.log("Usuario no encontrado"); 
             response.statusCode = 401;
             response.setHeader('WWW-Authenticate', 'Basic');
             response.end('No autorizado')
