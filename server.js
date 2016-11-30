@@ -32,9 +32,7 @@ app.use(expressPaginate.middleware(5, 10)); // Default req.query.limit.
 app.use(passport.initialize());
 // Estrategia de identificación y autorización básica
 passport.use( new BasicStrategy(function(username,password,done){
-    Contacto.findOne( // TODO: Averiguar por qué no encuentra el usuario admin:admin
-        {usuario: username, clave: password},
-        function(error,user){
+    usuarioAutorizado.findOne({usuario: username, clave: password},function(error,user){
         if (error){
             console.log("Error identificando usuario: " + error);
             return done(error);
@@ -43,10 +41,7 @@ passport.use( new BasicStrategy(function(username,password,done){
             console.log("Usuario " + username + " con clave " + password + " no encontrado.");
             return done (null, false);
         }
-        if(!user.verifyPassword(password)){
-            console.log("Clave incorrecta.");
-            return done(null, false);
-        }
+        
         console.log("Usuario " + username + " correctamente identificado");
         return done (null, user);
     });
