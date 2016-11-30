@@ -19,7 +19,9 @@ fs.statSync(logDirectorio).isDirectory() || fs.mkdir(logDirectorio);
 var logStream = fs.createWriteStream(__dirname + "/logs/access.log", {'flags': 'a'});
 var purgador = require("./mis_modulos/purgaQuery");
 var CacheControl = require("express-cache-control");
-var autorizacionBasica = require("basic-auth");
+var passport = require("passport");
+var BasicStrategy = require("passport-http").BasicStrategy;
+
 
 // Middleware
 var cache = new CacheControl().middleware;
@@ -27,6 +29,29 @@ app.use(logger('dev', {stream: logStream}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(expressPaginate.middleware(5, 10)); // Default req.query.limit.
+app.use(passport.initialize());
+// Estrategia de identificación y autorización básica
+passport.use( new BasicStrategy(function(username,password,done){
+    Contacto.findOne( // TODO: Averiguar por qué no encuentra el usuario admin:admin
+        {usuario: username, clave: password},
+        function(error,user){
+        if (error){
+            console.log("Error identificando usuario: " + error);
+            return done(error);
+        }
+        if (!user){ 
+            console.log("Usuario " + username + " con clave " + password + " no encontrado.");
+            return done (null, false);
+        }
+        if(!user.verifyPassword(password)){
+            console.log("Clave incorrecta.");
+            return done(null, false);
+        }
+        console.log("Usuario " + username + " correctamente identificado");
+        return done (null, user);
+    });
+}));
+
 
 // Conexión con la BD
 mongoose.connect('mongodb://localhost/contactos');
@@ -79,38 +104,6 @@ administrador.save(function (error) {
         console.log("Error al crear usuario admin:" + error);
     }
 });
-// Middleware de autenticacion básica
-app.use(function (request, response, next) {
-    var credenciales = autorizacionBasica(request);
-    if (credenciales === undefined) {
-        console.log("No se ha proporcionado información de usuario");
-        response.statusCode = 401;
-        response.setHeader('WWW-Authenticate', 'Basic');
-        response.end('No autorizado')
-    } else {
-        console.log("Credenciales proporcionadas. Usuario: " + credenciales.name +  ". Clave: " + credenciales.pass);
-        autentifica(credenciales.name, credenciales.pass, response, next);
-    }
-});
-
-function autentifica(name, pass, response, callback) {
-    usuarioAutorizado.findOne({usuario: name, clave: pass}, function (error, usuario) {
-        if (error) {
-            console.log("Error al buscar usuario");
-            response.statusCode = 500;
-            response.end('Error 500')
-        } else if (!usuario) {
-            console.log("Usuario no encontrado"); 
-            response.statusCode = 401;
-            response.setHeader('WWW-Authenticate', 'Basic');
-            response.end('No autorizado')
-        } else {
-            console.log("Usuario " + usuario.usuario + " identificado correctamente.");
-            return callback(null, usuario.nombre);
-        }
-    });
-}
-
 
 // Request Handler de las direcciones publicadas. Reenvía a la version ACTUAL
 
@@ -164,7 +157,7 @@ app.delete('/v1/contactos/:numTlf', function (request, response) {
 
 // Handlers de los Request con número de version en la URL
 
-app.get('/v2/contactos', cache("minutes", 5), function (request, response) {
+app.get('/v2/contactos', cache("minutes", 5), passport.authenticate('basic', { session: false }), function (request, response) {
     var get_params = url.parse(request.url, true).query;
     if (Object.keys(get_params).length === 0) {
         console.log("Listado completo, paginado, ya que no se envían parámetros");
