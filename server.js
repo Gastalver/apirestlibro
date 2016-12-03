@@ -11,6 +11,7 @@ var mongoose = require('mongoose');
 var Grid = require('gridfs-stream');
 var servicioDatos_v1 = require("./mis_modulos/contactosServicioDatos_v1");
 var servicioDatos_v2 = require("./mis_modulos/contactosServicioDatos_v2");
+var admin = require("./mis_modulos/admin.js");
 var expressPaginate = require('express-paginate');
 var mongoosePaginate = require('mongoose-paginate');
 // Configuración de logs
@@ -66,6 +67,7 @@ var contactoSchema = new mongoose.Schema(
 // Plugin del schema para paginar resultados.
 contactoSchema.plugin(mongoosePaginate);
 
+
 // Schema para los usuarios de la API
 var usuarioSchema = new mongoose.Schema(
     {
@@ -75,6 +77,7 @@ var usuarioSchema = new mongoose.Schema(
     }
 );
 
+usuarioSchema.plugin(mongoosePaginate);
 
 // Modelo de Contactos para operar en la BD
 var Contacto = mongoose.model('Contacto', contactoSchema);
@@ -82,25 +85,26 @@ var Contacto = mongoose.model('Contacto', contactoSchema);
 // Modelo de usuarioAutorizado para operar en la BD
 var usuarioAutorizado = mongoose.model('Usuario', usuarioSchema);
 
+
 // Creamos el usuario autorizado admin
-var administrador = new usuarioAutorizado(
-    {
-        usuario: 'admin',
-        clave: 'admin',
-        rol: 'administrador'
-    }
-);
+//var administrador = new usuarioAutorizado(
+//    {
+//        usuario: 'admin',
+//        clave: 'admin',
+//        rol: 'administrador'
+//    }
+//);
 
-administrador.save(function (error) {
-    if (!error) {
-        administrador.save();
-        console.log("Usuario admin creado");
-    } else {
-        console.log("Error al crear usuario admin:" + error);
-    }
-});
+//administrador.save(function (error) {
+    //if (!error) {
+      //  administrador.save();
+        //console.log("Usuario admin creado");
+    //} else {
+      //  console.log("Error al crear usuario admin:" + error);
+   // }
+//});
 
-// Request Handler de las direcciones publicadas. Reenvía a la version ACTUAL
+// Request Handler de las direcciones publicadas de la API. Reenvía a la version ACTUAL
 
 app.get('/contactos', function (request, response) {
     var get_params = url.parse(request.url, true).query;
@@ -203,6 +207,48 @@ app.delete('/v2/contactos/:numTlf/imagen', function (request, response) {
     var gfs = Grid(mongodb.db, mongoose.mongo);
     servicioDatos_v2.borraImagen(gfs, mongodb.db, request.params.numTlf, response);
 });
+
+// Request Handlers de la zona de administración de usuarios
+
+
+function autorizacion(user, response){
+    if (user==null || user.rol!=="administrador" ){
+        response.writeHead(403,{"Content-Type":"Text/plain"});
+        response.end("Acceso no autorizado");
+    }
+}
+
+
+app.post('/admin', passport.authenticate('basic', { session: false }),
+    function(request, response) {
+        autorizacion(request.user, response);
+        if (!response.closed) {
+            admin.crear(usuarioAutorizado, request.body, response);
+        }
+    }
+);
+
+app.delete('/admin/:borraturi',passport.authenticate('basic', {session: false}),
+    function (request, response) {
+        autorizacion(request.user, response)
+        {
+            if (!response.closed) {
+                admin.borrar(usuarioAutorizado, request.params.borraturi, response);
+            }
+        }
+    }
+)
+
+app.get('/admin', passport.authenticate('basic', {session: false}),
+  function (request,response) {
+      autorizacion(request.user,response);
+      if (!response.closed) {
+          admin.listado(usuarioAutorizado, request,response);
+      }
+  }
+);
+
+
 
 http.createServer(app).listen(3000, function () {
     console.log('Servidor Express operativo en puerto 3000');
