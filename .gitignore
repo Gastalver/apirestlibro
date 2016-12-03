@@ -1,4 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
+ssl/*
+
+
 ### Node template
 # Logs
 logs
@@ -42,3 +45,4 @@ jspm_packages
 .idea/
 node_modules/
 logs/
+ssl/

@@ -6,6 +6,7 @@
   "repository": "https://github.com/Gastalver/apirestlibro.git",
   "scripts": {
     "monitoriza": "nodemon ./server.js localhost 3000",
+    "monitorizaHttps": "nodemon ./server.js localhost 3443",
     "test": "mocha ./test/testModeloContacto.js"
   },
   "author": "",

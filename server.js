@@ -3,8 +3,9 @@ var bodyParser = require("body-parser");
 var path = require("path");
 var logger = require("morgan");
 var url = require("url");
-var http = require('http');
+var https = require('https');
 var app = express();
+app.set('port', process.env.PORT || 3443);
 // var objeteador = require('./mis_modulos/propiedadesObjeto');
 var fs = require('fs');
 var mongoose = require('mongoose');
@@ -22,6 +23,8 @@ var purgador = require("./mis_modulos/purgaQuery");
 var CacheControl = require("express-cache-control");
 var passport = require("passport");
 var BasicStrategy = require("passport-http").BasicStrategy;
+
+var opcionesHTTPS = {key: fs.readFileSync('./ssl/contactos.pem'), cert: fs.readFileSync('./ssl/contactos.crt')}
 
 
 // Middleware
@@ -250,6 +253,6 @@ app.get('/admin', passport.authenticate('basic', {session: false}),
 
 
 
-http.createServer(app).listen(3000, function () {
-    console.log('Servidor Express operativo en puerto 3000');
+https.createServer(opcionesHTTPS,app).listen(app.get('port'), function () {
+    console.log('Servidor Express operativo en puerto 3443');
 });
